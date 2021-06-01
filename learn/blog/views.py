@@ -4,7 +4,8 @@ from django.views.generic import (
     ListView,
     DetailView,
     CreateView,
-    UpdateView
+    UpdateView,
+    DeleteView
 )
 from .models import Post
 #some fake posts to see how things work.
@@ -41,7 +42,15 @@ class PostUpdateView(LoginRequiredMixin,UserPassesTestMixin, UpdateView):
         post=self.get_object()
         if self.request.user == post.author:
             return True
-        return False    
+        return False  
+class PostDeleteView(LoginRequiredMixin,UserPassesTestMixin,DeleteView):
+    model=Post 
+    success_url = '/'
+    def test_func(self):#to make sure that the login user can delete in his own project
+        post=self.get_object()
+        if self.request.user == post.author:
+            return True
+        return False     
 # this is what a user will see.We also need to map a url pattern to this view function.
 def about(request):
     return render(request, 'blog/about.html',{ 'title':'About'})
